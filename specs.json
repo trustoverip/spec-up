@@ -55,8 +55,9 @@
       "markdown_paths": [
         "header.md",
         "abstract.md",
-        "getting-started.md",
-        "features.md"
+        "summary.md",
+        "motivation.md",
+        "scope.md"
       ],
       "assets": [
         { "path": "/custom-assets/custom.css" },
