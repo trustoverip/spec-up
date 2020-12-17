@@ -99,6 +99,12 @@ merge: ## Merge local machine environment with template repo
 devenv: serve_specup ## Run development environemnt to Generates HTML content
 	@echo "Launching Test Server for access via http://localhost:"$(DEV_SITE_PORT)
 	docker exec -it $(REPO_NAME) bash
+	
+deploy:
+	@rm -f index.html
+	@cp $(SITE_DIR)/index.html index.html
+	@echo "Deploying genterated HTML spec content..."
+	@ls -la *.html
 
 pubenv: clean prepare_pandocs ## Prepare print environemnt
 	docker run -ti -v ${PWD}:/$(PUB_HOST_DIR) --entrypoint=/bin/bash $(PANDOCS_IMAGE)
