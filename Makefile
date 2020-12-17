@@ -17,6 +17,7 @@
 # rebase: Rebase local machine environment with upstream repo
 # merge: Rebase local machine environment with template repo
 # devenv: Prepare development environemnt
+# deploy: Prepare site for GitHub Pages
 # pubenv: Prepare publication environemnt
 # publish: Generate HTML and PDF versions of content
 # -----------------------------------------------------------------------------
@@ -25,7 +26,7 @@
 # Special targets
 # -----------------------------------------------------------------------------
 
-.PHONY: help clean publish
+.PHONY: help clean publish deploy
 .DEFAULT_GOAL: help
 
 # -----------------------------------------------------------------------------
@@ -35,7 +36,7 @@
 # Repo Instance Specific
 REPO_NAME ?= toip-spec-up
 UPSTREAM_REPO ?= https://github.com/trustoverip/spec-up.git
-DEV_SITE_PORT ?= 7600
+DEV_SITE_PORT ?= 7500
 SITE_DIR ?= spec_site/toip
 
 # Template Repo Defaults
@@ -53,7 +54,7 @@ PUBLISH_DIR ?= publish
 
 help:
 	@echo "\n"$(REPO_NAME)"\n"
-	@(grep -h "##" Makefile  | tail -6) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@(grep -h "##" Makefile  | tail -7) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 # -----------------------------------------------------------------------------
 # Targets
@@ -69,6 +70,7 @@ prepare_git:
 
 # Build all required Docker images
 build_images: ./docker/specup/Dockerfile ./docker/pandocs/Dockerfile
+	-docker rmi $(DEV_IMAGE)
 	docker build -t $(DEV_IMAGE) -f ./docker/specup/Dockerfile .
 	docker build -t $(PANDOCS_IMAGE) -f ./docker/pandocs/Dockerfile .
 	docker images | grep -h "trustoverip"
@@ -98,12 +100,12 @@ merge: ## Merge local machine environment with template repo
 
 devenv: serve_specup ## Run development environemnt to Generates HTML content
 	@echo "Launching Test Server for access via http://localhost:"$(DEV_SITE_PORT)
-	docker exec -it $(REPO_NAME) bash
-	
-deploy:
-	@rm -f index.html
-	@cp $(SITE_DIR)/index.html index.html
+	docker exec -it $(CONTAINER_NAME) bash
+
+deploy: $(SITE_DIR)/index.html ## Prepare site for GitHub Pages
 	@echo "Deploying genterated HTML spec content..."
+	@rm -f ./index.html
+	@cp $(SITE_DIR)/index.html .
 	@ls -la *.html
 
 pubenv: clean prepare_pandocs ## Prepare print environemnt
