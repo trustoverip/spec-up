@@ -57,7 +57,9 @@
         "abstract.md",
         "summary.md",
         "motivation.md",
-        "scope.md"
+        "scope.md",
+        "audience.md",
+        "introduction.md"
       ],
       "assets": [
         { "path": "/custom-assets/custom.css" },
